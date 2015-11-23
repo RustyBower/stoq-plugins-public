@@ -20,6 +20,78 @@ class CuckooWorker(StoqWorkerPlugin):
         parser = argparse.ArgumentParser()
         parser = StoqArgs(parser)
 
+        worker_opts = parser.add_argument_group('Plugin Options')
+
+        worker_opts.add_argument('-u', '--url',
+                                 dest='url_payload',
+                                 default=False,
+                                 help='Submit URL for Cuckoo Task')
+
+        worker_opts.add_argument('--package',
+                                 dest='package',
+                                 default=False,
+                                 help='analysis package used for analysis')
+
+        worker_opts.add_argument('--timeout',
+                                 dest='timeout',
+                                 default=False,
+                                 help='analysis timeout (in seconds)')
+
+        worker_opts.add_argument('--priority',
+                                 dest='priority',
+                                 default=False,
+                                 help='priority to assign task (1-3)')
+
+        worker_opts.add_argument('--options',
+                                 dest='options',
+                                 default=False,
+                                 help='options to pass to analysis package')
+
+        worker_opts.add_argument('--machine',
+                                 dest='machine',
+                                 default=False,
+                                 help='ID of analysis machine to use')
+
+        worker_opts.add_argument('--platform',
+                                 dest='platform',
+                                 default=False,
+                                 help='platform to select analysis machine')
+
+        worker_opts.add_argument('--tags',
+                                 dest='tags',
+                                 default=False,
+                                 help="""define machine to start by tags.
+                                         Platform must be set to use that.
+                                         Tags are comma separated""")
+
+        worker_opts.add_argument('--custom',
+                                 dest='custom',
+                                 default=False,
+                                 help="""custom string to pass over for the
+                                         analysis and processing/reporting
+                                         modules""")
+
+        worker_opts.add_argument('--owner',
+                                 dest='owner',
+                                 default=False,
+                                 help='task owner')
+
+        worker_opts.add_argument('--memory',
+                                 dest='memory',
+                                 default=False,
+                                 help='enable tfull memory dump')
+
+        worker_opts.add_argument('--enforce_timeout',
+                                 dest='enforce_timeout',
+                                 default=False,
+                                 help='enforce execution for full timeout')
+
+        worker_opts.add_argument('--clock',
+                                 dest='clock',
+                                 default=False,
+                                 help="""set virtual machine clock
+                                         (format %m-%d-%Y %H:%M:%S)""")
+
         options = parser.parse_args(sys.argv[2:])
         super().activate(options=options)
 
@@ -28,7 +100,14 @@ class CuckooWorker(StoqWorkerPlugin):
     def scan(self, payload, **kwargs):
 
         results = {}
-        submission = self.submit_file(payload, **kwargs)
+
+        if payload:
+            submission = self.submit_file(payload, **kwargs)
+        elif 'url_payload' in kwargs:
+            url_location = kwargs.pop('url_payload')
+            submission = self.submit_url(url_location, **kwargs)
+        else:
+            raise Exception('No file or url payload passed')
 
         if submission.status_code == requests.codes.ok:
             task_id = submission.json()['task_ids'][0]
@@ -40,7 +119,7 @@ class CuckooWorker(StoqWorkerPlugin):
 
             while True:
                 if current > timeout:
-                    break  # Timeout period expired
+                    raise Exception('Timeout')
 
                 time.sleep(interval)
                 current += interval
@@ -53,7 +132,7 @@ class CuckooWorker(StoqWorkerPlugin):
                         results = self.view_report(task_id)
                         break
                 else:
-                    break  # Something went wrong
+                    raise Exception(task.status_code)
 
         return results
 
