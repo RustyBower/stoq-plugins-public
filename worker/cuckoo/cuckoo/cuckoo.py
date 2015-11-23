@@ -33,8 +33,17 @@ class CuckooWorker(StoqWorkerPlugin):
         if submission.status_code == requests.codes.ok:
             task_id = submission.json()['task_ids'][0]
 
+            # Timeout specifications
+            interval = 10
+            timeout = 300
+            current = 0
+
             while True:
-                time.sleep(20)
+                if current > timeout:
+                    break  # Timeout period expired
+
+                time.sleep(interval)
+                current += interval
                 task = self.view_task(task_id)
 
                 if task.status_code == requests.codes.ok:
@@ -44,8 +53,7 @@ class CuckooWorker(StoqWorkerPlugin):
                         results = self.view_report(task_id)
                         break
                 else:
-                    # Something went wrong
-                    break
+                    break  # Something went wrong
 
         return results
 
