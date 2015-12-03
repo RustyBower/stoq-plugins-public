@@ -18,7 +18,7 @@ Module = cuckoo
 
 [Documentation]
 Author = Adam Trask
-Version = 0.1
+Version = 0.1.1
 Website = https://github.com/PUNCH-Cyber/stoq-plugins-public
 Description = Interact with Cuckoo Sandbox via API calls
 
@@ -27,4 +27,4 @@ hashpayload = True
 saveresults = True
 
 # API URL
-api_location = http://10.0.0.160:8090
+url = http://127.0.0.1:8090
