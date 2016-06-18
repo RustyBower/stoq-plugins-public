@@ -36,7 +36,7 @@ images_list = winxp-sp3, win7-sp1, win7x64-sp1
 # Should we verify the SSL certificate. True or False
 verify_ssl = True
 
-# Define the API version. Valid options: 1.0.0 or 1.1.0
+# Define the API version. Valid options: 1.1.0
 api_version = 1.1.0
 
 # Should the filename be retained?
