@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="fireeye",
-    version="0.1.4",
+    version="0.1.5",
     author="Marcus LaFerrera (@mlaferrera), Aaron Gee-Clough (@gclef_) & Adam Trask (@taskr)",
     url="https://github.com/PUNCH-Cyber/stoq-plugins-public",
     license="Apache License 2.0",
