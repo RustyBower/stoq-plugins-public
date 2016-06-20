@@ -368,9 +368,9 @@ class ResponseHandler(object):
                 except ValueError:
                     # Attempt to cleanup malformed or unwanted JSON elements
                     # from FireEye and then use demjson to load the object
-                    cleanedObject = re.sub(r'\n\s+', "", responseObject.text)
-                    cleanedObject = re.sub(r'\n', "", cleanedObject)
-                    cleanedObject = re.sub(r'N/A', "\"N/A\"", cleanedObject)
+                    cleanedObject = re.sub(r'\n\s+', '', responseObject.text)
+                    cleanedObject = re.sub(r'\n', '', cleanedObject)
+                    cleanedObject = re.sub(r'(\"+)?N/A(\"+)?', '\"N/A\"', cleanedObject)
                     self.response_object = demjson.decode(cleanedObject)
                 except:
                     message = 'JSON parsing error of response:\n{}'\
